@@ -39,6 +39,14 @@ class GoogleSheetsBaseStream(RESTStream):
         sheet = self.gc.open_by_key(self.config["sheet_id"])
         if "child_sheet_name" in self.config:
             worksheet = sheet.worksheet(self.config["child_sheet_name"])
+        elif "gid" in self.config:
+            worksheet_list = sheet.worksheets()
+            target_gid = self.config["gid"]
+            worksheet = None
+            for worksheet_ in worksheet_list:
+                if worksheet_.id == target_gid:
+                    worksheet = worksheet_
+                    break
         else:
             worksheet = sheet.sheet1
         expected_headers = worksheet.row_values(1)
