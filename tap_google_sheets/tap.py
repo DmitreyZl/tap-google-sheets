@@ -40,6 +40,12 @@ class TapGoogleSheets(Tap):
             required=False,
             description="id of the child sheet to sync.",
         ),
+        th.Property(
+            "output_name",
+            th.StringType,
+            required=False,
+            description="id of the child sheet to sync.",
+        ),
         th.Property("stream_maps", th.ObjectType()),
         th.Property("stream_map_config", th.ObjectType()),
     ).to_dict()
@@ -52,8 +58,8 @@ class TapGoogleSheets(Tap):
         """
         streams = []
         stream_schema = self.get_schema(self.get_sheet_data())
-        if not self.config["child_sheet_name"]:
-            name = self.config["gid"]
+        if not self.config.get("child_sheet_name"):
+            name = self.config.get("output_name")
         else:
             name = self.config["child_sheet_name"]
         streams.append(
@@ -78,7 +84,7 @@ class TapGoogleSheets(Tap):
             target_gid = self.config["gid"]
             worksheet = None
             for worksheet_ in worksheet_list:
-                if worksheet_.id == target_gid:
+                if worksheet_.id == int(float(target_gid)):
                     worksheet = worksheet_
                     break
         else:

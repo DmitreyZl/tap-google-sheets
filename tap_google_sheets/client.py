@@ -44,7 +44,7 @@ class GoogleSheetsBaseStream(RESTStream):
             target_gid = self.config["gid"]
             worksheet = None
             for worksheet_ in worksheet_list:
-                if worksheet_.id == target_gid:
+                if worksheet_.id == int(float(target_gid)):
                     worksheet = worksheet_
                     break
         else:
