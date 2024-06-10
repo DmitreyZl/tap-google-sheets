@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import gspread
+from transliterate import translit, get_available_language_codes
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
@@ -34,6 +35,12 @@ class TapGoogleSheets(Tap):
             required=True,
             description="Name of the child sheet to sync.",
         ),
+        th.Property(
+            "gid",
+            th.StringType,
+            required=True,
+            description="id of the child sheet to sync.",
+        ),
         th.Property("stream_maps", th.ObjectType()),
         th.Property("stream_map_config", th.ObjectType()),
     ).to_dict()
@@ -49,7 +56,7 @@ class TapGoogleSheets(Tap):
         streams.append(
             GoogleSheetsStream(
                 tap=self,
-                name=self.config["child_sheet_name"],
+                name=self.config["child_sheet_name"] ,
                 schema=stream_schema,
             ),
         )
@@ -62,7 +69,16 @@ class TapGoogleSheets(Tap):
         )
         sheet = gc.open_by_key(self.config["sheet_id"])
         if "child_sheet_name" in self.config:
-            worksheet = sheet.worksheet(self.config["child_sheet_name"])
+            name = translit(self.config["child_sheet_name"], 'ru')
+            worksheet = sheet.worksheet(name)
+        elif "gid" in self.config:
+            worksheet_list = sheet.worksheets()
+            target_gid = self.config["gid"]
+            worksheet = None
+            for worksheet_ in worksheet_list:
+                if worksheet_.id == target_gid:
+                    worksheet = worksheet_
+                    break
         else:
             worksheet = sheet.sheet1
         expected_headers = worksheet.row_values(1)
