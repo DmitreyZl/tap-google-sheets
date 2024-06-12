@@ -50,4 +50,5 @@ class GoogleSheetsBaseStream(RESTStream):
         else:
             worksheet = sheet.sheet1
         expected_headers = worksheet.row_values(self.config["column_index"] if "column_index" in self.config else 1)
-        return worksheet.get_all_records(expected_headers=expected_headers)
+        return worksheet.get_all_records(head=self.config["column_index"] if "column_index" in self.config else 1,
+                                         expected_headers=expected_headers)
