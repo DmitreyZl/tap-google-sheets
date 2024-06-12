@@ -58,10 +58,10 @@ class TapGoogleSheets(Tap):
         """
         streams = []
         stream_schema = self.get_schema(self.get_sheet_data())
-        if not self.config.get("child_sheet_name"):
-            name = self.config.get("output_name")
+        if not self.config.get("output_name"):
+            name = self.config.get("child_sheet_name")
         else:
-            name = self.config["child_sheet_name"]
+            name = self.config.get("output_name")
         streams.append(
             GoogleSheetsStream(
                 tap=self,
