@@ -46,6 +46,12 @@ class TapGoogleSheets(Tap):
             required=False,
             description="id of the child sheet to sync.",
         ),
+        th.Property(
+            "column_index",
+            th.IntegerType,
+            required=False,
+            description="index value column",
+        ),
         th.Property("stream_maps", th.ObjectType()),
         th.Property("stream_map_config", th.ObjectType()),
     ).to_dict()
@@ -89,7 +95,7 @@ class TapGoogleSheets(Tap):
                     break
         else:
             worksheet = sheet.sheet1
-        expected_headers = worksheet.row_values(1)
+        expected_headers = worksheet.row_values(self.config["column_index"] if "column_index" in self.config else 1)
         return worksheet.get_all_records(expected_headers=expected_headers)
 
     def get_schema(self, google_sheet_data: list[dict]) -> dict:
